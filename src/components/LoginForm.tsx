@@ -58,7 +58,7 @@ const LoginForm: React.FC = () => {
               className="h-16"
             />
           </div>
-          <CardTitle className="text-3xl font-bold text-green-500">
+          <CardTitle className="text-3xl font-bold text-tech-purple">
             Manager
           </CardTitle>
           <CardDescription>
@@ -81,7 +81,7 @@ const LoginForm: React.FC = () => {
             </div>
             <Button
               type="submit"
-              className="w-full bg-green-500 hover:bg-green-600 text-white"
+              className="w-full bg-tech-purple hover:bg-tech-purple/90 text-white"
               disabled={isLoading}
             >
               {isLoading ? "Verificando..." : "Acessar Sistema"}

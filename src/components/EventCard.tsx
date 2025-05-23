@@ -124,7 +124,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     e.stopPropagation();
                     onReview(event);
                   }}
-                  className="bg-green-500 hover:bg-green-600 text-white"
+                  className="bg-tech-purple hover:bg-tech-purple/90 text-white"
                 >
                   Revisar
                 </Button>

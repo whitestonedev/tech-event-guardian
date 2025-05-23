@@ -190,13 +190,13 @@ const Dashboard: React.FC = () => {
           <TabsList className="grid w-full grid-cols-2 bg-muted">
             <TabsTrigger
               value="pending"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="data-[state=active]:bg-tech-purple data-[state=active]:text-primary-foreground"
             >
               Eventos Pendentes ({pendingEvents.length})
             </TabsTrigger>
             <TabsTrigger
               value="approved"
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="data-[state=active]:bg-tech-purple data-[state=active]:text-primary-foreground"
             >
               Eventos Aprovados ({approvedEvents.length})
             </TabsTrigger>
