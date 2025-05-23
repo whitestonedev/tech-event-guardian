@@ -52,12 +52,14 @@ const LoginForm: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">TE</span>
-            </div>
+            <img
+              src="/img/logotipo_white.png"
+              alt="Tech Event Guardian"
+              className="h-16"
+            />
           </div>
           <CardTitle className="text-3xl font-bold text-green-500">
-            Calendario.tech Manager
+            Manager
           </CardTitle>
           <CardDescription>
             Insira seu token de acesso para continuar

@@ -158,9 +158,13 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-background noise-bg">
       <header className="border-b border-border glassmorphism">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-            Calendario.tech Manager
-          </h1>
+          <div className="flex items-center gap-2">
+            <img
+              src="/img/logotipo_white.png"
+              alt="Tech Event Guardian"
+              className="h-16"
+            />
+          </div>
           <div className="flex gap-2">
             <Button
               variant="outline"
