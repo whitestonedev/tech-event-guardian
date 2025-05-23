@@ -19,7 +19,15 @@ export default defineConfig(({ mode }) => ({
         enabled: true,
       },
       injectRegister: "auto",
-      includeAssets: ["vite.svg", "robots.txt", "apple-touch-icon.png"],
+      includeAssets: [
+        "vite.svg",
+        "robots.txt",
+        "apple-touch-icon.png",
+        "pwa-64x64.png",
+        "pwa-192x192.png",
+        "pwa-512x512.png",
+        "maskable-icon-512x512.png",
+      ],
       manifest: {
         name: "Tech Event Guardian",
         short_name: "EventGuardian",
