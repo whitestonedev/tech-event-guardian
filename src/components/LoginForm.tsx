@@ -1,13 +1,18 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '../contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "../contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 const LoginForm: React.FC = () => {
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
@@ -25,7 +30,7 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
     try {
       // Simulate token validation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       login(token);
       toast({
         title: "Sucesso",
@@ -43,18 +48,18 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 noise-bg">
-      <Card className="w-full max-w-md glassmorphism tech-border">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-black">TE</span>
+            <div className="w-16 h-16 bg-green-500 rounded-lg flex items-center justify-center">
+              <span className="text-2xl font-bold text-white">TE</span>
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-            Tech Event Manager
+          <CardTitle className="text-3xl font-bold text-green-500">
+            Calendario.tech Manager
           </CardTitle>
-          <CardDescription className="text-muted-foreground">
+          <CardDescription>
             Insira seu token de acesso para continuar
           </CardDescription>
         </CardHeader>
@@ -66,19 +71,18 @@ const LoginForm: React.FC = () => {
                 placeholder="Token de acesso"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                className="bg-input border-border focus:border-primary"
                 disabled={isLoading}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-gray-500">
                 O token expira em 24 horas
               </p>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-black font-semibold"
+            <Button
+              type="submit"
+              className="w-full bg-green-500 hover:bg-green-600 text-white"
               disabled={isLoading}
             >
-              {isLoading ? 'Verificando...' : 'Acessar Sistema'}
+              {isLoading ? "Verificando..." : "Acessar Sistema"}
             </Button>
           </form>
         </CardContent>

@@ -1,4 +1,3 @@
-
 export interface Event {
   id: number;
   event_name: string;
@@ -9,16 +8,16 @@ export interface Event {
   event_link: string;
   maps_link: string;
   online: boolean;
-  status: 'pending' | 'approved' | 'declined';
+  status: "approved" | "declined" | "requested";
   tags: string[];
   intl: {
-    'pt-br': {
+    "pt-br": {
       banner_link: string;
       cost: string;
       event_edition: string;
       short_description: string;
     };
-    'en-us': {
+    "en-us": {
       banner_link: string;
       cost: string;
       event_edition: string;

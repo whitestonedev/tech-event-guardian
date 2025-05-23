@@ -1,12 +1,11 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, MapPin, Globe, Building } from 'lucide-react';
-import { Event } from '../types';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import React from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, MapPin, Globe, Building } from "lucide-react";
+import { Event } from "../types";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface EventCardProps {
   event: Event;
@@ -16,18 +15,38 @@ interface EventCardProps {
   showActions?: boolean;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ 
-  event, 
-  onReview, 
-  onEdit, 
-  onDelete, 
-  showActions = true 
+const EventCard: React.FC<EventCardProps> = ({
+  event,
+  onReview,
+  onEdit,
+  onDelete,
+  showActions = true,
 }) => {
   const startDate = new Date(event.start_datetime);
   const endDate = new Date(event.end_datetime);
 
+  const handleCardClick = () => {
+    console.log("Card clicado:", {
+      event,
+      status: event.status,
+      hasOnReview: !!onReview,
+    });
+    if (
+      (event.status === "pending" || event.status === "requested") &&
+      onReview
+    ) {
+      console.log("Chamando onReview com evento:", event);
+      onReview(event);
+    }
+  };
+
   return (
-    <Card className="glassmorphism hover:border-primary/50 transition-all duration-300 group">
+    <Card
+      className="hover:border-primary/50 transition-all duration-300 group cursor-pointer"
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+    >
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1">
@@ -39,24 +58,26 @@ const EventCard: React.FC<EventCardProps> = ({
               <span className="text-sm">{event.organization_name}</span>
             </div>
           </div>
-          <Badge 
-            variant={event.status === 'approved' ? 'default' : 'secondary'}
-            className={event.status === 'approved' ? 'bg-green-600' : 'bg-yellow-600'}
+          <Badge
+            variant={event.status === "approved" ? "default" : "secondary"}
+            className={
+              event.status === "approved" ? "bg-green-600" : "bg-yellow-600"
+            }
           >
-            {event.status === 'approved' ? 'Aprovado' : 'Pendente'}
+            {event.status === "approved" ? "Aprovado" : "Pendente"}
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar className="w-4 h-4" />
             <span>
-              {format(startDate, 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+              {format(startDate, "dd/MM/yyyy HH:mm", { locale: ptBR })}
             </span>
           </div>
-          
+
           <div className="flex items-center gap-2 text-muted-foreground">
             {event.online ? (
               <>
@@ -72,9 +93,9 @@ const EventCard: React.FC<EventCardProps> = ({
           </div>
         </div>
 
-        {event.intl?.['pt-br']?.short_description && (
+        {event.intl?.["pt-br"]?.short_description && (
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {event.intl['pt-br'].short_description}
+            {event.intl["pt-br"].short_description}
           </p>
         )}
 
@@ -95,29 +116,39 @@ const EventCard: React.FC<EventCardProps> = ({
 
         {showActions && (
           <div className="flex gap-2 pt-2">
-            {event.status === 'pending' && onReview && (
-              <Button 
-                size="sm" 
-                onClick={() => onReview(event)}
-                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-black"
-              >
-                Revisar
-              </Button>
-            )}
-            {event.status === 'approved' && onEdit && (
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => onEdit(event)}
+            {(event.status === "pending" || event.status === "requested") &&
+              onReview && (
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReview(event);
+                  }}
+                  className="bg-green-500 hover:bg-green-600 text-white"
+                >
+                  Revisar
+                </Button>
+              )}
+            {event.status === "approved" && onEdit && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(event);
+                }}
               >
                 Editar
               </Button>
             )}
             {onDelete && (
-              <Button 
-                size="sm" 
-                variant="destructive" 
-                onClick={() => onDelete(event.id)}
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(event.id);
+                }}
               >
                 Excluir
               </Button>

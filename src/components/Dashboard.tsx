@@ -1,15 +1,14 @@
-
-import React, { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { LogOut, RefreshCw } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { apiService } from '../services/api';
-import { Event } from '../types';
-import EventCard from './EventCard';
-import EventReviewModal from './EventReviewModal';
-import EventFilters from './EventFilters';
-import { toast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { LogOut, RefreshCw } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { apiService } from "../services/api";
+import { Event } from "../types";
+import EventCard from "./EventCard";
+import EventReviewModal from "./EventReviewModal";
+import EventFilters from "./EventFilters";
+import { toast } from "@/hooks/use-toast";
 
 const Dashboard: React.FC = () => {
   const { logout, token } = useAuth();
@@ -20,10 +19,12 @@ const Dashboard: React.FC = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   // Filter states
-  const [pendingSearchTerm, setPendingSearchTerm] = useState('');
-  const [approvedSearchTerm, setApprovedSearchTerm] = useState('');
+  const [pendingSearchTerm, setPendingSearchTerm] = useState("");
+  const [approvedSearchTerm, setApprovedSearchTerm] = useState("");
   const [pendingSelectedTags, setPendingSelectedTags] = useState<string[]>([]);
-  const [approvedSelectedTags, setApprovedSelectedTags] = useState<string[]>([]);
+  const [approvedSelectedTags, setApprovedSelectedTags] = useState<string[]>(
+    []
+  );
 
   useEffect(() => {
     if (token) {
@@ -37,7 +38,7 @@ const Dashboard: React.FC = () => {
     try {
       const [pending, approved] = await Promise.all([
         apiService.getPendingEvents(),
-        apiService.getApprovedEvents()
+        apiService.getApprovedEvents(),
       ]);
       setPendingEvents(pending);
       setApprovedEvents(approved);
@@ -53,16 +54,29 @@ const Dashboard: React.FC = () => {
   };
 
   const handleReviewEvent = (event: Event) => {
+    console.log("handleReviewEvent chamado com evento:", event);
     setSelectedEvent(event);
     setIsReviewModalOpen(true);
+    console.log("Estado do modal atualizado:", {
+      selectedEvent: event,
+      isOpen: true,
+    });
   };
 
-  const handleApproveEvent = async (eventId: number, updatedEvent?: Partial<Event>) => {
+  const handleApproveEvent = async (
+    eventId: number,
+    updatedEvent?: Partial<Event>
+  ) => {
     try {
-      await apiService.approveEvent(eventId, 'approved');
-      if (updatedEvent) {
+      // Primeiro aprova o evento
+      await apiService.approveEvent(eventId, "approved");
+
+      // Só atualiza o evento se houver alterações
+      if (updatedEvent && Object.keys(updatedEvent).length > 0) {
+        console.log("Atualizando dados do evento:", updatedEvent);
         await apiService.updateEvent(eventId, updatedEvent);
       }
+
       await loadEvents();
     } catch (error) {
       toast({
@@ -75,7 +89,7 @@ const Dashboard: React.FC = () => {
 
   const handleDeclineEvent = async (eventId: number) => {
     try {
-      await apiService.approveEvent(eventId, 'declined');
+      await apiService.approveEvent(eventId, "declined");
       await loadEvents();
     } catch (error) {
       toast({
@@ -105,24 +119,40 @@ const Dashboard: React.FC = () => {
 
   const getAllTags = (events: Event[]) => {
     const tags = new Set<string>();
-    events.forEach(event => {
-      event.tags.forEach(tag => tags.add(tag));
+    events.forEach((event) => {
+      event.tags.forEach((tag) => tags.add(tag));
     });
     return Array.from(tags);
   };
 
-  const filterEvents = (events: Event[], searchTerm: string, selectedTags: string[]) => {
-    return events.filter(event => {
-      const matchesSearch = event.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          event.organization_name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesTags = selectedTags.length === 0 || 
-                         selectedTags.some(tag => event.tags.includes(tag));
+  const filterEvents = (
+    events: Event[],
+    searchTerm: string,
+    selectedTags: string[]
+  ) => {
+    return events.filter((event) => {
+      const matchesSearch =
+        event.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.organization_name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+      const matchesTags =
+        selectedTags.length === 0 ||
+        selectedTags.some((tag) => event.tags.includes(tag));
       return matchesSearch && matchesTags;
     });
   };
 
-  const filteredPendingEvents = filterEvents(pendingEvents, pendingSearchTerm, pendingSelectedTags);
-  const filteredApprovedEvents = filterEvents(approvedEvents, approvedSearchTerm, approvedSelectedTags);
+  const filteredPendingEvents = filterEvents(
+    pendingEvents,
+    pendingSearchTerm,
+    pendingSelectedTags
+  );
+  const filteredApprovedEvents = filterEvents(
+    approvedEvents,
+    approvedSearchTerm,
+    approvedSelectedTags
+  );
 
   return (
     <div className="min-h-screen bg-background noise-bg">
@@ -132,13 +162,15 @@ const Dashboard: React.FC = () => {
             Tech Event Manager
           </h1>
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={loadEvents}
               disabled={loading}
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+              />
               Atualizar
             </Button>
             <Button variant="outline" size="sm" onClick={logout}>
@@ -152,10 +184,16 @@ const Dashboard: React.FC = () => {
       <main className="container mx-auto px-4 py-6">
         <Tabs defaultValue="pending" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 bg-muted">
-            <TabsTrigger value="pending" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="pending"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               Eventos Pendentes ({pendingEvents.length})
             </TabsTrigger>
-            <TabsTrigger value="approved" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TabsTrigger
+              value="approved"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
               Eventos Aprovados ({approvedEvents.length})
             </TabsTrigger>
           </TabsList>
@@ -168,9 +206,9 @@ const Dashboard: React.FC = () => {
               onStatusFilterChange={() => {}}
               selectedTags={pendingSelectedTags}
               onTagToggle={(tag) => {
-                setPendingSelectedTags(prev => 
-                  prev.includes(tag) 
-                    ? prev.filter(t => t !== tag)
+                setPendingSelectedTags((prev) =>
+                  prev.includes(tag)
+                    ? prev.filter((t) => t !== tag)
                     : [...prev, tag]
                 );
               }}
@@ -208,9 +246,9 @@ const Dashboard: React.FC = () => {
               onStatusFilterChange={() => {}}
               selectedTags={approvedSelectedTags}
               onTagToggle={(tag) => {
-                setApprovedSelectedTags(prev => 
-                  prev.includes(tag) 
-                    ? prev.filter(t => t !== tag)
+                setApprovedSelectedTags((prev) =>
+                  prev.includes(tag)
+                    ? prev.filter((t) => t !== tag)
                     : [...prev, tag]
                 );
               }}
@@ -246,6 +284,7 @@ const Dashboard: React.FC = () => {
         event={selectedEvent}
         isOpen={isReviewModalOpen}
         onClose={() => {
+          console.log("Modal fechando");
           setIsReviewModalOpen(false);
           setSelectedEvent(null);
         }}
