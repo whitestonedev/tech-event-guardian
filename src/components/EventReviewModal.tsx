@@ -15,6 +15,7 @@ import { Event } from "../types";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { DateTimePicker } from "./DateTimePicker";
 
 interface EventReviewModalProps {
   event: Event | null;
@@ -216,27 +217,17 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Data/Hora de Início</Label>
-                <Input
-                  type="datetime-local"
-                  value={editedEvent.start_datetime.slice(0, 16)}
-                  onChange={(e) =>
-                    handleFieldChange("start_datetime", e.target.value + ":00")
-                  }
-                />
-              </div>
+              <DateTimePicker
+                label="Data/Hora de Início"
+                value={editedEvent.start_datetime.slice(0, 16)}
+                onChange={(value) => handleFieldChange("start_datetime", value)}
+              />
 
-              <div className="space-y-2">
-                <Label>Data/Hora de Fim</Label>
-                <Input
-                  type="datetime-local"
-                  value={editedEvent.end_datetime.slice(0, 16)}
-                  onChange={(e) =>
-                    handleFieldChange("end_datetime", e.target.value + ":00")
-                  }
-                />
-              </div>
+              <DateTimePicker
+                label="Data/Hora de Fim"
+                value={editedEvent.end_datetime.slice(0, 16)}
+                onChange={(value) => handleFieldChange("end_datetime", value)}
+              />
 
               <div className="space-y-2">
                 <Label>Link do Evento</Label>
@@ -333,20 +324,6 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                           )
                         }
                       />
-                      {langData.banner_link && (
-                        <div className="relative w-full h-32 mt-2 rounded-lg overflow-hidden border">
-                          <img
-                            src={langData.banner_link}
-                            alt={`Banner ${langCode}`}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src =
-                                "https://placehold.co/600x400/EFFAF1/8F8F8F?text=Imagem+não+encontrada";
-                            }}
-                          />
-                        </div>
-                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Custo</Label>
