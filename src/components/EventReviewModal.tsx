@@ -35,6 +35,44 @@ interface EventReviewModalProps {
 type IntlField = "banner_link" | "cost" | "event_edition" | "short_description";
 type EventStatus = "requested" | "approved" | "declined";
 
+const AVAILABLE_LANGUAGES = {
+  "pt-br": "Português",
+  "en-us": "Inglês",
+  "es-es": "Espanhol",
+} as const;
+
+const CURRENCY_FORMATS = {
+  "pt-br": {
+    currency: "BRL",
+    locale: "pt-BR",
+  },
+  "en-us": {
+    currency: "USD",
+    locale: "en-US",
+  },
+  "es-es": {
+    currency: "MXN",
+    locale: "es-MX",
+  },
+} as const;
+
+const formatCurrency = (
+  value: string,
+  langCode: keyof typeof AVAILABLE_LANGUAGES
+) => {
+  if (!value) return "";
+  // Remove qualquer caractere que não seja número
+  const numbers = value.replace(/\D/g, "");
+  // Converte para número e divide por 100 para ter os centavos
+  const amount = Number(numbers) / 100;
+  // Formata o valor com a moeda correta
+  const format = CURRENCY_FORMATS[langCode];
+  return new Intl.NumberFormat(format.locale, {
+    style: "currency",
+    currency: format.currency,
+  }).format(amount);
+};
+
 const EventReviewModal: React.FC<EventReviewModalProps> = ({
   event,
   isOpen,
@@ -71,7 +109,13 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
               ...prev.intl,
               [lang]: {
                 ...prev.intl[lang],
-                [field]: value,
+                [field]:
+                  field === "cost"
+                    ? formatCurrency(
+                        value,
+                        lang as keyof typeof AVAILABLE_LANGUAGES
+                      )
+                    : value,
               },
             },
           }
@@ -79,7 +123,7 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
     );
   };
 
-  const handleAddLanguage = (langCode: string) => {
+  const handleAddLanguage = (langCode: keyof typeof AVAILABLE_LANGUAGES) => {
     setEditedEvent((prev) =>
       prev
         ? {
@@ -178,6 +222,13 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
       setShowConfirmation(true);
       setConfirmationType("decline");
     }
+  };
+
+  const getAvailableLanguages = () => {
+    if (!editedEvent) return [];
+    return Object.keys(AVAILABLE_LANGUAGES).filter(
+      (lang) => !editedEvent.intl[lang]
+    );
   };
 
   return (
@@ -337,35 +388,41 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h4 className="font-semibold">Informações por Idioma</h4>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Código do idioma (ex: es-es)"
-                    className="w-48"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const input = e.target as HTMLInputElement;
-                        const langCode = input.value.trim().toLowerCase();
-                        if (langCode && !editedEvent.intl[langCode]) {
-                          handleAddLanguage(langCode);
-                          input.value = "";
-                        }
-                      }
-                    }}
-                  />
-                </div>
+                {getAvailableLanguages().length > 0 && (
+                  <Select
+                    onValueChange={(value) =>
+                      handleAddLanguage(
+                        value as keyof typeof AVAILABLE_LANGUAGES
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Adicionar tradução" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableLanguages().map((lang) => (
+                        <SelectItem key={lang} value={lang}>
+                          {
+                            AVAILABLE_LANGUAGES[
+                              lang as keyof typeof AVAILABLE_LANGUAGES
+                            ]
+                          }
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               {Object.entries(editedEvent.intl).map(([langCode, langData]) => (
                 <div key={langCode} className="space-y-4 border rounded-lg p-4">
                   <div className="flex justify-between items-center">
                     <h5 className="font-medium">
-                      {langCode === "pt-br"
-                        ? "Português"
-                        : langCode === "en-us"
-                        ? "Inglês"
-                        : langCode.toUpperCase()}
+                      {AVAILABLE_LANGUAGES[
+                        langCode as keyof typeof AVAILABLE_LANGUAGES
+                      ] || langCode.toUpperCase()}
                     </h5>
-                    {langCode !== "pt-br" && langCode !== "en-us" && (
+                    {langCode !== "pt-br" && (
                       <Button
                         variant="destructive"
                         size="sm"
@@ -409,6 +466,13 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                         value={langData.cost}
                         onChange={(e) =>
                           handleIntlChange(langCode, "cost", e.target.value)
+                        }
+                        placeholder={
+                          langCode === "pt-br"
+                            ? "R$ 0,00"
+                            : langCode === "en-us"
+                            ? "$0.00"
+                            : "MX$0.00"
                         }
                       />
                     </div>
