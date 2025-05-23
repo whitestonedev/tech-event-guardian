@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     ghPages(),
   ].filter(Boolean),
+  base: "/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
