@@ -16,6 +16,13 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { DateTimePicker } from "./DateTimePicker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EventReviewModalProps {
   event: Event | null;
@@ -26,6 +33,7 @@ interface EventReviewModalProps {
 }
 
 type IntlField = "banner_link" | "cost" | "event_edition" | "short_description";
+type EventStatus = "requested" | "approved" | "declined";
 
 const EventReviewModal: React.FC<EventReviewModalProps> = ({
   event,
@@ -37,7 +45,7 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
   const [editedEvent, setEditedEvent] = useState<Event | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationType, setConfirmationType] = useState<
-    "approve" | "decline" | null
+    "approve" | "decline" | "edit" | null
   >(null);
 
   React.useEffect(() => {
@@ -99,6 +107,37 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
     });
   };
 
+  const handleSave = () => {
+    if (showConfirmation) {
+      const hasChanges = Object.keys(editedEvent).some((key) => {
+        if (key === "intl") {
+          return (
+            JSON.stringify(editedEvent.intl) !== JSON.stringify(event.intl)
+          );
+        }
+        return editedEvent[key as keyof Event] !== event[key as keyof Event];
+      });
+
+      if (hasChanges) {
+        onApprove(event.id, editedEvent);
+        toast({
+          title: "Evento atualizado",
+          description: "As alterações foram salvas com sucesso!",
+        });
+      }
+      setShowConfirmation(false);
+      setConfirmationType(null);
+      onClose();
+    } else {
+      setShowConfirmation(true);
+      setConfirmationType("edit");
+    }
+  };
+
+  const handleStatusChange = (newStatus: EventStatus) => {
+    setEditedEvent((prev) => (prev ? { ...prev, status: newStatus } : null));
+  };
+
   const handleApprove = () => {
     if (showConfirmation) {
       const hasChanges = Object.keys(editedEvent).some((key) => {
@@ -153,34 +192,40 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
         {showConfirmation ? (
           <div className="space-y-6 p-6 text-center">
             <h3 className="text-lg font-semibold">
-              {confirmationType === "approve"
-                ? event.status === "approved"
-                  ? "Confirmar Alterações"
-                  : "Confirmar Aprovação"
+              {confirmationType === "edit"
+                ? "Confirmar Alterações"
+                : confirmationType === "approve"
+                ? "Confirmar Aprovação"
                 : "Confirmar Recusa"}
             </h3>
             <p className="text-muted-foreground">
-              {confirmationType === "approve"
-                ? event.status === "approved"
-                  ? "Tem certeza que deseja salvar as alterações realizadas neste evento?"
-                  : "Tem certeza que deseja aprovar este evento com as alterações realizadas?"
+              {confirmationType === "edit"
+                ? "Tem certeza que deseja salvar as alterações realizadas neste evento?"
+                : confirmationType === "approve"
+                ? "Tem certeza que deseja aprovar este evento com as alterações realizadas?"
                 : "Tem certeza que deseja recusar este evento?"}
             </p>
             <div className="flex gap-4 justify-center">
               <Button
                 onClick={
-                  confirmationType === "approve" ? handleApprove : handleDecline
+                  confirmationType === "edit"
+                    ? handleSave
+                    : confirmationType === "approve"
+                    ? handleApprove
+                    : handleDecline
                 }
                 className={
-                  confirmationType === "approve"
+                  confirmationType === "edit"
+                    ? "bg-blue-500 hover:bg-blue-600 text-white"
+                    : confirmationType === "approve"
                     ? "bg-green-500 hover:bg-green-600 text-white"
                     : "bg-red-500 hover:bg-red-600 text-white"
                 }
               >
-                {confirmationType === "approve"
-                  ? event.status === "approved"
-                    ? "Salvar Alterações"
-                    : "Confirmar Aprovação"
+                {confirmationType === "edit"
+                  ? "Salvar Alterações"
+                  : confirmationType === "approve"
+                  ? "Confirmar Aprovação"
                   : "Confirmar Recusa"}
               </Button>
               <Button
@@ -258,6 +303,25 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                 />
                 <Label>Evento Online</Label>
               </div>
+
+              {event.status === "approved" && (
+                <div className="space-y-2">
+                  <Label>Status do Evento</Label>
+                  <Select
+                    value={editedEvent.status}
+                    onValueChange={handleStatusChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="requested">Solicitado</SelectItem>
+                      <SelectItem value="approved">Aprovado</SelectItem>
+                      <SelectItem value="declined">Recusado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             {!editedEvent.online && (
@@ -380,8 +444,8 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
               {event.status === "approved" ? (
                 <>
                   <Button
-                    onClick={handleApprove}
-                    className="bg-green-500 hover:bg-green-600 text-white"
+                    onClick={handleSave}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
                   >
                     Salvar Alterações
                   </Button>
