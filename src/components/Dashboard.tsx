@@ -117,6 +117,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleEditEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setIsReviewModalOpen(true);
+  };
+
   const getAllTags = (events: Event[]) => {
     const tags = new Set<string>();
     events.forEach((event) => {
@@ -275,6 +280,7 @@ const Dashboard: React.FC = () => {
                   <EventCard
                     key={event.id}
                     event={event}
+                    onEdit={handleEditEvent}
                     onDelete={handleDeleteEvent}
                   />
                 ))}

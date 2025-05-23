@@ -119,7 +119,7 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl text-green-500">
-            Revisar Evento
+            {event.status === "approved" ? "Editar Evento" : "Revisar Evento"}
           </DialogTitle>
         </DialogHeader>
 
@@ -127,12 +127,16 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
           <div className="space-y-6 p-6 text-center">
             <h3 className="text-lg font-semibold">
               {confirmationType === "approve"
-                ? "Confirmar Aprovação"
+                ? event.status === "approved"
+                  ? "Confirmar Alterações"
+                  : "Confirmar Aprovação"
                 : "Confirmar Recusa"}
             </h3>
             <p className="text-muted-foreground">
               {confirmationType === "approve"
-                ? "Tem certeza que deseja aprovar este evento com as alterações realizadas?"
+                ? event.status === "approved"
+                  ? "Tem certeza que deseja salvar as alterações realizadas neste evento?"
+                  : "Tem certeza que deseja aprovar este evento com as alterações realizadas?"
                 : "Tem certeza que deseja recusar este evento?"}
             </p>
             <div className="flex gap-4 justify-center">
@@ -147,7 +151,9 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                 }
               >
                 {confirmationType === "approve"
-                  ? "Confirmar Aprovação"
+                  ? event.status === "approved"
+                    ? "Salvar Alterações"
+                    : "Confirmar Aprovação"
                   : "Confirmar Recusa"}
               </Button>
               <Button
@@ -286,18 +292,34 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
             </div>
 
             <div className="flex gap-4 pt-4">
-              <Button
-                onClick={handleApprove}
-                className="bg-green-500 hover:bg-green-600 text-white"
-              >
-                Aprovar Evento
-              </Button>
-              <Button variant="destructive" onClick={handleDecline}>
-                Recusar Evento
-              </Button>
-              <Button variant="outline" onClick={onClose}>
-                Cancelar
-              </Button>
+              {event.status === "approved" ? (
+                <>
+                  <Button
+                    onClick={handleApprove}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Salvar Alterações
+                  </Button>
+                  <Button variant="outline" onClick={onClose}>
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleApprove}
+                    className="bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Aprovar Evento
+                  </Button>
+                  <Button variant="destructive" onClick={handleDecline}>
+                    Recusar Evento
+                  </Button>
+                  <Button variant="outline" onClick={onClose}>
+                    Cancelar
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
