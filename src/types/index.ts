@@ -8,7 +8,7 @@ export interface Event {
   event_link: string;
   maps_link: string;
   online: boolean;
-  status: "approved" | "declined" | "requested";
+  status: "approved" | "declined" | "requested" | "pending";
   tags: string[];
   intl: {
     "pt-br": {

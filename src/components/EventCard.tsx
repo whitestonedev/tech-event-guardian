@@ -2,7 +2,14 @@ import React from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Globe, Building } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Globe,
+  Building,
+  Tag,
+  DollarSign,
+} from "lucide-react";
 import { Event } from "../types";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -42,11 +49,18 @@ const EventCard: React.FC<EventCardProps> = ({
 
   return (
     <Card
-      className="hover:border-primary/50 transition-all duration-300 group cursor-pointer"
+      className="hover:border-primary/50 transition-all duration-300 group cursor-pointer overflow-hidden"
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
     >
+      <div className="relative w-full h-48">
+        <img
+          src={Object.values(event.intl)[0].banner_link}
+          alt={event.event_name}
+          className="w-full h-full object-cover"
+        />
+      </div>
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start gap-4">
           <div className="flex-1">
@@ -90,6 +104,16 @@ const EventCard: React.FC<EventCardProps> = ({
                 <span className="truncate">{event.address}</span>
               </>
             )}
+          </div>
+
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <DollarSign className="w-4 h-4" />
+            <span>{event.intl["pt-br"].cost}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Tag className="w-4 h-4" />
+            <span>{event.intl["pt-br"].event_edition}</span>
           </div>
         </div>
 

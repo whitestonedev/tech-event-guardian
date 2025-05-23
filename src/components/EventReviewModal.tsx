@@ -24,6 +24,8 @@ interface EventReviewModalProps {
   onDecline: (eventId: number) => void;
 }
 
+type IntlField = "banner_link" | "cost" | "event_edition" | "short_description";
+
 const EventReviewModal: React.FC<EventReviewModalProps> = ({
   event,
   isOpen,
@@ -47,15 +49,11 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
     return null;
   }
 
-  const handleFieldChange = (field: keyof Event, value: any) => {
+  const handleFieldChange = (field: keyof Event, value: string | boolean) => {
     setEditedEvent((prev) => (prev ? { ...prev, [field]: value } : null));
   };
 
-  const handleIntlChange = (
-    lang: "pt-br" | "en-us",
-    field: string,
-    value: string
-  ) => {
+  const handleIntlChange = (lang: string, field: IntlField, value: string) => {
     setEditedEvent((prev) =>
       prev
         ? {
@@ -70,6 +68,34 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
           }
         : null
     );
+  };
+
+  const handleAddLanguage = (langCode: string) => {
+    setEditedEvent((prev) =>
+      prev
+        ? {
+            ...prev,
+            intl: {
+              ...prev.intl,
+              [langCode]: {
+                banner_link: "",
+                cost: "",
+                event_edition: "",
+                short_description: "",
+              },
+            },
+          }
+        : null
+    );
+  };
+
+  const handleRemoveLanguage = (langCode: string) => {
+    setEditedEvent((prev) => {
+      if (!prev) return null;
+      const newIntl = { ...prev.intl };
+      delete newIntl[langCode];
+      return { ...prev, intl: newIntl };
+    });
   };
 
   const handleApprove = () => {
@@ -222,6 +248,16 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Link do Maps</Label>
+                <Input
+                  value={editedEvent.maps_link}
+                  onChange={(e) =>
+                    handleFieldChange("maps_link", e.target.value)
+                  }
+                />
+              </div>
+
               <div className="space-y-2 flex items-center gap-2">
                 <Switch
                   checked={editedEvent.online}
@@ -244,40 +280,112 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
             )}
 
             <div className="space-y-4">
-              <h4 className="font-semibold">Informações em Português</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Custo</Label>
+              <div className="flex justify-between items-center">
+                <h4 className="font-semibold">Informações por Idioma</h4>
+                <div className="flex gap-2">
                   <Input
-                    value={editedEvent.intl["pt-br"].cost}
-                    onChange={(e) =>
-                      handleIntlChange("pt-br", "cost", e.target.value)
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Edição</Label>
-                  <Input
-                    value={editedEvent.intl["pt-br"].event_edition}
-                    onChange={(e) =>
-                      handleIntlChange("pt-br", "event_edition", e.target.value)
-                    }
+                    placeholder="Código do idioma (ex: es-es)"
+                    className="w-48"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const input = e.target as HTMLInputElement;
+                        const langCode = input.value.trim().toLowerCase();
+                        if (langCode && !editedEvent.intl[langCode]) {
+                          handleAddLanguage(langCode);
+                          input.value = "";
+                        }
+                      }
+                    }}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Descrição Curta</Label>
-                <Textarea
-                  value={editedEvent.intl["pt-br"].short_description}
-                  onChange={(e) =>
-                    handleIntlChange(
-                      "pt-br",
-                      "short_description",
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
+
+              {Object.entries(editedEvent.intl).map(([langCode, langData]) => (
+                <div key={langCode} className="space-y-4 border rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <h5 className="font-medium">
+                      {langCode === "pt-br"
+                        ? "Português"
+                        : langCode === "en-us"
+                        ? "Inglês"
+                        : langCode.toUpperCase()}
+                    </h5>
+                    {langCode !== "pt-br" && langCode !== "en-us" && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveLanguage(langCode)}
+                      >
+                        Remover
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Link do Banner</Label>
+                      <Input
+                        value={langData.banner_link}
+                        onChange={(e) =>
+                          handleIntlChange(
+                            langCode,
+                            "banner_link",
+                            e.target.value
+                          )
+                        }
+                      />
+                      {langData.banner_link && (
+                        <div className="relative w-full h-32 mt-2 rounded-lg overflow-hidden border">
+                          <img
+                            src={langData.banner_link}
+                            alt={`Banner ${langCode}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src =
+                                "https://placehold.co/600x400/EFFAF1/8F8F8F?text=Imagem+não+encontrada";
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Custo</Label>
+                      <Input
+                        value={langData.cost}
+                        onChange={(e) =>
+                          handleIntlChange(langCode, "cost", e.target.value)
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Edição</Label>
+                      <Input
+                        value={langData.event_edition}
+                        onChange={(e) =>
+                          handleIntlChange(
+                            langCode,
+                            "event_edition",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Descrição Curta</Label>
+                    <Textarea
+                      value={langData.short_description}
+                      onChange={(e) =>
+                        handleIntlChange(
+                          langCode,
+                          "short_description",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className="space-y-2">
