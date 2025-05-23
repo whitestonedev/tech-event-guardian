@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
     }),
   ].filter(Boolean),
 
-  base: "/",
+  base: mode === "production" ? "https://manage.calendario.tech/" : "/",
 
   css: {
     postcss: {
