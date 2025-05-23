@@ -1,7 +1,6 @@
+import { Event } from "../types";
 
-import { Event } from '../types';
-
-const API_BASE_URL = 'https://api.calendario.tech';
+const API_BASE_URL = "https://api.calendario.tech";
 
 class ApiService {
   private token: string | null = null;
@@ -13,8 +12,8 @@ class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = {
-      'Content-Type': 'application/json',
-      ...(this.token && { 'Authorization': `Bearer ${this.token}` }),
+      "Content-Type": "application/json",
+      ...(this.token && { Authorization: `Bearer ${this.token}` }),
       ...options.headers,
     };
 
@@ -31,30 +30,33 @@ class ApiService {
   }
 
   async getPendingEvents(): Promise<Event[]> {
-    return this.request('/events/submit/review/');
+    return this.request("/events/submit/review/");
   }
 
   async getApprovedEvents(): Promise<Event[]> {
-    return this.request('/events/');
+    return this.request("/events/");
   }
 
-  async approveEvent(eventId: number, action: 'approved' | 'declined'): Promise<void> {
+  async approveEvent(
+    eventId: number,
+    action: "approved" | "declined"
+  ): Promise<void> {
     return this.request(`/events/submit/${eventId}`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ action }),
     });
   }
 
   async updateEvent(eventId: number, eventData: Partial<Event>): Promise<void> {
     return this.request(`/events/${eventId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(eventData),
     });
   }
 
   async deleteEvent(eventId: number): Promise<void> {
     return this.request(`/events/${eventId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 }
