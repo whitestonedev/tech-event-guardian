@@ -388,6 +388,20 @@ const EventReviewModal: React.FC<EventReviewModalProps> = ({
                           )
                         }
                       />
+                      {langData.banner_link && (
+                        <div className="relative w-full h-32 mt-2 rounded-lg overflow-hidden border">
+                          <img
+                            src={langData.banner_link}
+                            alt={`Banner ${langCode}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src =
+                                "https://placehold.co/600x400/EFFAF1/8F8F8F?text=Imagem+não+encontrada";
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>Custo</Label>
