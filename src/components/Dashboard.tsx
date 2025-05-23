@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
       <header className="border-b border-border glassmorphism">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-            Tech Event Manager
+            Calendario.tech Manager
           </h1>
           <div className="flex gap-2">
             <Button
