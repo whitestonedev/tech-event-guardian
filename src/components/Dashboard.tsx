@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, RefreshCw } from "lucide-react";
+import { LogOut, RefreshCw, Globe, Code } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { apiService } from "../services/api";
 import { Event } from "../types";
@@ -162,15 +162,38 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-background noise-bg">
       <header className="border-b border-border glassmorphism">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4 md:gap-0">
+          <div className="flex justify-center md:justify-start">
             <img
               src="/img/logotipo_white.png"
               alt="Tech Event Guardian"
               className="h-16"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-center md:justify-end gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                window.open("https://www.calendario.tech/", "_blank")
+              }
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              Site
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                window.open(
+                  "https://api.calendario.tech/openapi/scalar",
+                  "_blank"
+                )
+              }
+            >
+              <Code className="w-4 h-4 mr-2" />
+              API
+            </Button>
             <Button
               variant="outline"
               size="sm"
